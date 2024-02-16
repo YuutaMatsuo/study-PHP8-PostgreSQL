@@ -1,0 +1,43 @@
+version: '3'
+services:
+  nginx:
+    image: nginx:1.25.0
+    ports:
+      - 8000:80
+    volumes:
+      # ./srcフォルダをコンテナ内の/var/www/htmlにマウント
+      - ./src:/var/www/html
+      # ./docker/nginxフォルダをコンテナ内の/etc/nginx/conf.dにマウント
+      - ./docker/nginx:/etc/nginx/conf.d
+    # 依存関係を設定
+    depends_on:
+      - app
+  # PHP-FPMの定義
+  app:
+    build:
+      # Dockerfileを格納するフォルダのパス
+      context: ./docker/php
+      # Dockerfileのファイル名
+      dockerfile: Dockerfile
+    volumes:
+      # ./srcフォルダをコンテナ内の/var/www/htmlにマウント
+    - ./src:/var/www/html 
+    depends_on:
+      - postgres
+  # PostgreSQLの定義
+  postgres:
+    image: postgres:latest
+    # ポートの設定
+    ports:
+      - "5433:5432"
+    restart: always
+    # 環境変数を設定
+    environment:
+      - POSTGRES_USER=${USER_NAME}
+      - POSTGRES_PASSWORD=${USER_PASS}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - db_vol:/var/lib/postgresql/data
+
+volumes:
+  db_vol:
