@@ -5,12 +5,14 @@ FROM php:8.3.2-fpm
 COPY php.ini /usr/local/etc/php/
 
 # パッケージやPHPの拡張モジュールをインストールするコマンド　を実行
+# PostgreSQLの開発ライブラリをインストール
 RUN apt-get update && apt-get install -y \
 	git \
 	curl \
 	zip \
 	unzip \
-    && docker-php-ext-install pdo_mysql
+	libpq-dev \ 
+    && docker-php-ext-install pdo_pgsql
 
 # 作業ディレクトリを/var/wwwに設定
 WORKDIR /var/www
